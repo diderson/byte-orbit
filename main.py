@@ -1,5 +1,7 @@
+import sys
 import fileinput
 from collections import defaultdict
+from operator import itemgetter
 
 def team_point(filename):
     # Read input file and construct game result per line
@@ -34,11 +36,43 @@ def team_point(filename):
 
         results[team_one_name] += team_one_increment
         results[team_two_name] += team_two_increment
-    return results
+
+    #let now sort the teams by point Desc and name
+    sort_team = sorted(results.items(), key=itemgetter(0))
+    final_table = sorted(sort_team, key=itemgetter(1), reverse=True)
+
+    return final_table
+
+
+def soccer_ranking_table():
+    team_point_list = team_point('soccer_input.txt')
+    previous_point = team_point_list[0][1]
+    current_team_position = 1
+    team_position = 0
+
+    for r in team_point_list:
+        team = r[0]
+        point = r[1]
+
+        if point == previous_point:
+            rank = current_team_position
+            team_position += 1
+        elif point < previous_point:
+            previous_point = point
+            current_team_position += team_position
+            rank = current_team_position
+            team_position = 1
+
+        unit = 'pt'
+        if point > 1:
+            unit = 'pts'
+
+        output = "%s. %s, %s %s\n" % (rank, team, point, unit)
+        sys.stdout.write(output)
+
 
 def main():
-    my_games = team_point('soccer_input.txt')
-    print(my_games)
+   soccer_ranking_table() 
 
 
 if __name__ == '__main__':
